@@ -180,6 +180,11 @@ func (dj *DemoJob) MaxFails() uint {
 	return 3
 }
 
+// Priority implements the interface in job/Interface
+func (dj *DemoJob) Priority() uint {
+	return job.JobPriorityNormal
+}
+
 // ShouldRetry ...
 func (dj *DemoJob) ShouldRetry() bool {
 	return true

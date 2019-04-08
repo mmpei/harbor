@@ -23,6 +23,7 @@ import (
 	"github.com/goharbor/harbor/src/jobservice/env"
 	"github.com/goharbor/harbor/src/jobservice/errs"
 	"github.com/goharbor/harbor/src/jobservice/opm"
+	"github.com/goharbor/harbor/src/common/job"
 )
 
 // DemoJob is the job to demostrate the job interface.
@@ -31,6 +32,11 @@ type DemoJob struct{}
 // MaxFails is implementation of same method in Interface.
 func (dj *DemoJob) MaxFails() uint {
 	return 3
+}
+
+// Priority implements the interface in job/Interface
+func (dj *DemoJob) Priority() uint {
+	return job.JobPriorityNormal
 }
 
 // ShouldRetry ...

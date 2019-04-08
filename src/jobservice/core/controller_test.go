@@ -19,6 +19,7 @@ import (
 
 	"github.com/goharbor/harbor/src/jobservice/env"
 	"github.com/goharbor/harbor/src/jobservice/models"
+	"github.com/goharbor/harbor/src/common/job"
 )
 
 func TestLaunchGenericJob(t *testing.T) {
@@ -304,6 +305,10 @@ type fakeJob struct{}
 
 func (j *fakeJob) MaxFails() uint {
 	return 3
+}
+
+func (j *fakeJob) Priority() uint {
+	return job.JobPriorityNormal
 }
 
 func (j *fakeJob) ShouldRetry() bool {

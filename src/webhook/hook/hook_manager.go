@@ -12,8 +12,8 @@ import (
 	"github.com/goharbor/harbor/src/core/config"
 	common_job "github.com/goharbor/harbor/src/common/job"
 	"github.com/goharbor/harbor/src/core/utils"
-	"github.com/goharbor/harbor/src/webhook/controller"
 	"encoding/json"
+	"github.com/goharbor/harbor/src/webhook/job"
 )
 
 // Manager ...
@@ -22,13 +22,15 @@ type Manager interface {
 }
 
 type HookManager struct {
-	filter *hook.FilterManager
-	client common_job.Client
+	jobManager  job.Manager
+	filter      *hook.FilterManager
+	client      common_job.Client
 }
 
 // NewHookManager is the constructor of HookManager.
 func NewHookManager() *HookManager {
 	return  &HookManager{
+		jobManager: job.NewDefaultManager(),
 		filter: hook.NewFilterManager(),
 		client: utils.GetJobServiceClient(),
 	}
@@ -68,7 +70,7 @@ func (hm *HookManager) StartHook(policy *models.WebhookPolicy, metadata ...map[s
 	if policy.ProjectID == 0 { // registry level, not support now
 
 	} else { // the triggered item in one project
-		jobData, err := controller.JobManager.Generate(policy, triggerItems)
+		jobData, err := hm.jobManager.Generate(policy, triggerItems)
 		if err != nil {
 			return fmt.Errorf("failed to get job data: %v", err)
 		}

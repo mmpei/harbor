@@ -359,6 +359,10 @@ func (j *fakeJob) MaxFails() uint {
 	return 3
 }
 
+func (j *fakeJob) Priority() uint {
+	return 500
+}
+
 func (j *fakeJob) ShouldRetry() bool {
 	return true
 }
@@ -383,6 +387,10 @@ func (j *fakeUniqueJob) MaxFails() uint {
 	return 3
 }
 
+func (j *fakeUniqueJob) Priority() uint {
+	return 500
+}
+
 func (j *fakeUniqueJob) ShouldRetry() bool {
 	return true
 }
@@ -405,6 +413,10 @@ type fakeRunnableJob struct{}
 
 func (j *fakeRunnableJob) MaxFails() uint {
 	return 2
+}
+
+func (j *fakeRunnableJob) Priority() uint {
+	return 500
 }
 
 func (j *fakeRunnableJob) ShouldRetry() bool {

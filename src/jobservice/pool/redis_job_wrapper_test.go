@@ -97,6 +97,10 @@ func (j *fakeParentJob) MaxFails() uint {
 	return 1
 }
 
+func (j *fakeParentJob) Priority() uint {
+	return 500
+}
+
 func (j *fakeParentJob) ShouldRetry() bool {
 	return false
 }

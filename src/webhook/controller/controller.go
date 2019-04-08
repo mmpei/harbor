@@ -22,15 +22,7 @@ import (
 
 // Work as a global service
 var (
-	PolicyManager policy.Manager
-	HookManager   hook.Manager
-	JobManager    job.Manager
-)
-
-// Init creates the PolicyManager and inits it
-func Init() error {
 	PolicyManager = policy.NewDefaultManager()
-	HookManager = hook.NewHookManager()
-	JobManager = job.NewDefaultManager()
-	return nil
-}
+	HookManager   = hook.NewHookManager()
+	JobManager    = job.NewDefaultManager()
+)
