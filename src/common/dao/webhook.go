@@ -201,7 +201,7 @@ func SetWebhookJobUUID(id int64, uuid string) error {
 }
 
 func webhookJobQueryConditions(query ...*models.WebhookJobQuery) orm.QuerySeter {
-	qs := GetOrmer().QueryTable(new(models.WebhookJob))
+	qs := GetOrmer().QueryTable(&models.WebhookJob{})
 	if len(query) == 0 || query[0] == nil {
 		return qs
 	}

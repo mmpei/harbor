@@ -38,6 +38,7 @@ import (
 	"github.com/goharbor/harbor/src/core/service/token"
 	"github.com/goharbor/harbor/src/replication/core"
 	_ "github.com/goharbor/harbor/src/replication/event"
+	"github.com/goharbor/harbor/src/webhook/controller"
 )
 
 const (
@@ -126,6 +127,10 @@ func main() {
 
 	if err := core.Init(); err != nil {
 		log.Errorf("failed to initialize the replication controller: %v", err)
+	}
+
+	if err := controller.Init(); err != nil {
+		log.Errorf("failed to initialize the webhook controller: %v", err)
 	}
 
 	filter.Init()

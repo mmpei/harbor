@@ -7,6 +7,7 @@ import (
 	"net"
 	"bytes"
 	"github.com/goharbor/harbor/src/common/job"
+        "fmt"
 )
 
 // WebhookExecutor is the struct to send hook data to target
@@ -80,6 +81,7 @@ func (we *WebhookExecutor) execute(ctx env.JobContext, params map[string]interfa
 		return nil
 	} else {
 		we.logger.Errorf("webhook job(target: %s, jobData: %s) response code is %d", target, jobDetail, resp.StatusCode)
+                return fmt.Errorf("Response code is %d, webhook event was processed failed in remote endpoint. ", resp.StatusCode)
 	}
 	return nil
 }
