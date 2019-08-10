@@ -172,3 +172,34 @@ func preprocessAndSendImageHook(value interface{}) error {
 	return nil
 
 }
+
+// will return nil when it failed to get data
+func getScanOverview(digest string, tag string) *models.ImgScanOverview {
+	if len(digest) == 0 {
+		log.Debug("digest is nil")
+		return nil
+	}
+	data, err := dao.GetImgScanOverview(digest)
+	if err != nil {
+		log.Errorf("Failed to get scan result for tag:%s, digest: %s, error: %v", tag, digest, err)
+	}
+	if data == nil {
+		return nil
+	}
+	job, err := dao.GetScanJob(data.JobID)
+	if err != nil {
+		log.Errorf("Failed to get scan job for id:%d, error: %v", data.JobID, err)
+		return nil
+	} else if job == nil { // job does not exist
+		log.Errorf("The scan job with id: %d does not exist, returning nil", data.JobID)
+		return nil
+	}
+	data.Status = job.Status
+	if data.Status != models.JobFinished {
+		log.Debugf("Unsetting vulnerable related historical values, job status: %s", data.Status)
+		data.Sev = 0
+		data.CompOverview = nil
+		data.DetailsKey = ""
+	}
+	return data
+}

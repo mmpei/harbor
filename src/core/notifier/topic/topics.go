@@ -14,6 +14,11 @@ func init() {
 		model.PullImageTopic:   {&notification.ImagePreprocessHandler{}},
 		model.DeleteImageTopic: {&notification.ImagePreprocessHandler{}},
 		model.WebhookTopic:     {&notification.HTTPHandler{}},
+		model.UploadChartTopic:   {&notification.ChartPreprocessHandler{}},
+		model.DownloadChartTopic:   {&notification.ChartPreprocessHandler{}},
+		model.DeleteChartTopic: {&notification.ChartPreprocessHandler{}},
+		model.ScanningCompletedTopic: {&notification.ScanImagePreprocessHandler{}},
+		model.ScanningFailedTopic: {&notification.ScanImagePreprocessHandler{}},
 	}
 
 	for t, handlers := range handlersMap {
