@@ -14,4 +14,5 @@ const (
 	EventTypeProjectQuota      = "projectQuota"
 
 	NotifyTypeHTTP = "http"
+	NotifyTypeSlack = "slack"
 )
