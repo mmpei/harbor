@@ -95,6 +95,17 @@ func initRouters() {
 	beego.Router("/api/policies/replication", &api.RepPolicyAPI{}, "get:List;post:Post")
 	beego.Router("/api/policies/webhook/:id([0-9]+)", &api.WebhookPolicyAPI{})
 	beego.Router("/api/policies/webhook", &api.WebhookPolicyAPI{}, "get:List;post:Post")
+
+	// P2P preheat
+	beego.Router("/api/p2p/targets/", &api.P2PTargetAPI{}, "get:List;post:Post")
+	beego.Router("/api/p2p/targets/:id([0-9]+)", &api.P2PTargetAPI{})
+	beego.Router("/api/p2p/targets/:id([0-9]+)/policies/", &api.P2PTargetAPI{}, "get:ListPolicies")
+	beego.Router("/api/p2p/preheat/policies/:id([0-9]+)", &api.P2PPreheatPolicyAPI{})
+	beego.Router("/api/p2p/preheat/policies", &api.P2PPreheatPolicyAPI{}, "get:List;post:Post")
+	beego.Router("/api/p2p/preheat/jobs/", &api.P2PPreheatJobAPI{}, "get:List")
+	beego.Router("/api/p2p/preheat/jobs/:id([0-9]+)", &api.P2PPreheatJobAPI{})
+	beego.Router("/api/p2p/preheat/jobs/:id([0-9]+)/log", &api.P2PPreheatJobAPI{}, "get:GetLog")
+
 	beego.Router("/api/targets/", &api.TargetAPI{}, "get:List")
 	beego.Router("/api/targets/", &api.TargetAPI{}, "post:Post")
 	beego.Router("/api/targets/:id([0-9]+)", &api.TargetAPI{})
@@ -125,6 +136,7 @@ func initRouters() {
 	beego.Router("/service/notifications/jobs/replication/:id([0-9]+)", &jobs.Handler{}, "post:HandleReplication")
 	beego.Router("/service/notifications/jobs/adminjob/:id([0-9]+)", &admin.Handler{}, "post:HandleAdminJob")
 	beego.Router("/service/notifications/jobs/webhook/:id([0-9]+)", &jobs.Handler{}, "post:HandleWebhook")
+	beego.Router("/service/notifications/jobs/p2ppreheat/:id([0-9]+)", &jobs.Handler{}, "post:HandleP2PPreheat")
 	beego.Router("/service/token", &token.Handler{})
 
 	beego.Router("/v2/*", &controllers.RegistryProxy{}, "*:Handle")

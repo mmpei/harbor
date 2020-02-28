@@ -12,4 +12,7 @@ const (
 
 	// StartWebhookTopic : Start webhook request
 	StartWebhookTopic = "StartWebhook"
+
+	// StartP2PPreheatTopic : Start p2p preheat request
+	StartP2PPreheatTopic = "StartP2PPreheat"
 )

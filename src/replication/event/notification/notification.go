@@ -14,7 +14,10 @@
 
 package notification
 
-import "github.com/goharbor/harbor/src/webhook/models"
+import (
+	"github.com/goharbor/harbor/src/webhook/models"
+	p2p_models "github.com/goharbor/harbor/src/p2ppreheat/models"
+)
 
 // OnPushNotification contains the data required by this handler
 type OnPushNotification struct {
@@ -39,5 +42,12 @@ type StartReplicationNotification struct {
 type StartWebhookNotification struct {
 	// the policy trigger the notification
 	Policy *models.WebhookPolicy
+	Metadata map[string]interface{}
+}
+
+// StartP2PPreheatNotification contains data required by this handler
+type StartP2PPreheatNotification struct {
+	// the policy trigger the notification
+	Policy *p2p_models.P2PPreheatPolicy
 	Metadata map[string]interface{}
 }

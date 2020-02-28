@@ -15,6 +15,8 @@ const (
 	ImageGC = "IMAGE_GC"
 	// ImageWebhook the name of image webhook job in job service
 	ImageWebhook = "IMAGE_WEBHOOK"
+	// ImageP2PPreheat the name of image p2p preheat job in job service
+	ImageP2PPreheat = "IMAGE_P2P_PREHEAT"
 
 	// Job Priority define (1-100000).see https://github.com/gocraft/work#scheduling-algorithm
 	JobPriorityHigh = 50000

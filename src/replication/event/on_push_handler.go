@@ -31,6 +31,7 @@ import (
 	"github.com/goharbor/harbor/src/core/config"
 	"github.com/goharbor/harbor/src/webhook/controller"
 	"github.com/goharbor/harbor/src/webhook"
+	p2p_controller "github.com/goharbor/harbor/src/p2ppreheat/controller"
 )
 
 // OnPushHandler implements the notification handler interface to handle image on push event.
@@ -64,6 +65,14 @@ func (oph *OnPushHandler) Handle(value interface{}) error {
 		log.Error(err)
 		msg += "trigger webhook failed;"
 	}
+
+	err = checkAndTriggerP2PPreheat(notification.Image)
+	if err != nil {
+		handleResult = false
+		log.Error(err)
+		msg += "trigger p2p preheat failed;"
+	}
+
 	if handleResult {
 		return nil
 	} else {
@@ -160,6 +169,41 @@ func checkAndTriggerWebhook(image string) error {
 				image, policy.ID, err)
 		}
 		log.Infof("webhook topic for resource %s, policy %d triggered", image, policy.ID)
+	}
+	return nil
+}
+
+func checkAndTriggerP2PPreheat(image string) error {
+	project, _ := utils.ParseRepository(image)
+	prj, err := config.GlobalProjectMgr.Get(project)
+	if err != nil {
+		return fmt.Errorf("failed to get project %s, image %s: %v", project, image, err)
+	}
+
+	policies, _, err := p2p_controller.PolicyManager.GetPolicies(prj.ProjectID, "", 0, 0)
+	if err != nil {
+		return fmt.Errorf("failed to get p2p preheat policies projectID %d, image %s: %v", prj.ProjectID, image, err)
+	}
+
+	if len(policies) == 0 {
+		return nil
+	}
+
+	for _, policy := range policies {
+		item := models.FilterItem{
+			Kind:  replication.FilterItemKindTag,
+			Value: image,
+		}
+		if err := notifier.Publish(topic.StartP2PPreheatTopic, notification.StartP2PPreheatNotification{
+			Policy: policy,
+			Metadata: map[string]interface{}{
+				"candidates": []models.FilterItem{item},
+			},
+		}); err != nil {
+			return fmt.Errorf("failed to publish p2p preheat topic for resource %s, policy %d: %v",
+				image, policy.ID, err)
+		}
+		log.Infof("p2p preheat topic for resource %s, policy %d triggered", image, policy.ID)
 	}
 	return nil
 }

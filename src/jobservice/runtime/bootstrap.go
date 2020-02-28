@@ -39,6 +39,7 @@ import (
 	"github.com/goharbor/harbor/src/jobservice/utils"
 	"github.com/gomodule/redigo/redis"
 	"github.com/goharbor/harbor/src/jobservice/job/impl/webhook"
+	"github.com/goharbor/harbor/src/jobservice/job/impl/p2ppreheat"
 )
 
 const (
@@ -213,6 +214,7 @@ func (bs *Bootstrap) loadAndRunRedisWorkerPool(ctx *env.Context, cfg *config.Con
 			job.ImageReplicate:  (*replication.Replicator)(nil),
 			job.ImageGC:         (*gc.GarbageCollector)(nil),
 			job.ImageWebhook:    (*webhook.WebhookExecutor)(nil),
+			job.ImageP2PPreheat:    (*p2ppreheat.P2PPreheatExecutor)(nil),
 		}); err != nil {
 		// exit
 		return nil, err

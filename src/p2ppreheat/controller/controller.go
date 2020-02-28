@@ -12,35 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package models
+package controller
 
 import (
-	"github.com/astaxie/beego/orm"
+	"github.com/goharbor/harbor/src/p2ppreheat/policy"
+	"github.com/goharbor/harbor/src/p2ppreheat/job"
+	"github.com/goharbor/harbor/src/p2ppreheat/executor"
 )
 
-func init() {
-	orm.RegisterModel(new(RepTarget),
-		new(RepPolicy),
-		new(RepJob),
-		new(User),
-		new(Project),
-		new(Role),
-		new(AccessLog),
-		new(ScanJob),
-		new(RepoRecord),
-		new(ImgScanOverview),
-		new(ClairVulnTimestamp),
-		new(WatchItem),
-		new(ProjectMetadata),
-		new(ConfigEntry),
-		new(Label),
-		new(ResourceLabel),
-		new(UserGroup),
-		new(AdminJob),
-		new(JobLog),
-		new(WebhookPolicy),
-		new(WebhookJob),
-		new(P2PPreheatPolicy),
-		new(P2PPreheatJob),
-		new(P2PTarget))
+// Work as a global service
+var (
+	PolicyManager policy.Manager
+	Executor      executor.Executor
+	JobManager    job.Manager
+)
+
+// Init creates the PolicyManager and init it
+func Init() error {
+	PolicyManager = policy.NewDefaultManager()
+	Executor = executor.NewExecutor()
+	JobManager = job.NewDefaultManager()
+	return nil
 }

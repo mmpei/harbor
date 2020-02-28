@@ -28,6 +28,7 @@ func init() {
 		topic.ReplicationEventTopicOnPush:     {&OnPushHandler{}},
 		topic.ReplicationEventTopicOnDeletion: {&OnDeletionHandler{}},
 		topic.StartWebhookTopic:               {&StartWebhookHandler{}},
+		topic.StartP2PPreheatTopic:            {&StartP2PPreheatHandler{}},
 	}
 
 	for t, handlers := range handlersMap {

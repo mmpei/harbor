@@ -109,3 +109,13 @@ func (h *Handler) HandleWebhook() {
 		return
 	}
 }
+
+// HandleP2PPreheat handles the webhook of p2p preheat job
+func (h *Handler) HandleP2PPreheat() {
+	log.Debugf("received p2p preheat job status update event: job-%d, status-%s", h.id, h.status)
+	if err := dao.UpdateP2PPreheatJobStatus(h.id, h.status); err != nil {
+		log.Errorf("Failed to update p2p preheat job status, id: %d, status: %s", h.id, h.status)
+		h.HandleInternalServerError(err.Error())
+		return
+	}
+}

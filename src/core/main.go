@@ -40,6 +40,7 @@ import (
 	_ "github.com/goharbor/harbor/src/replication/event"
 	"github.com/goharbor/harbor/src/core/metrics"
 	"github.com/goharbor/harbor/src/webhook/controller"
+	p2p_controller "github.com/goharbor/harbor/src/p2ppreheat/controller"
 )
 
 const (
@@ -144,6 +145,10 @@ func main() {
 
 	if err := controller.Init(); err != nil {
 		log.Errorf("failed to initialize the webhook controller: %v", err)
+	}
+
+	if err := p2p_controller.Init(); err != nil {
+		log.Errorf("failed to initialize the p2p preheat controller: %v", err)
 	}
 
 	filter.Init()
