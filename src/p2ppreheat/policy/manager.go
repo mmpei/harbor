@@ -163,7 +163,7 @@ func convertFromDBModel(policy *common_models.P2PPreheatPolicy) (*models.P2PPreh
 	}
 
 	if len(policy.TargetIDs) > 0 {
-		targetList := []common_models.P2PTarget{}
+		targetList := []*common_models.P2PTarget{}
 		ids := strings.Split(policy.TargetIDs, ",")
 		for _, id := range ids {
 			ID, err := strconv.ParseInt(id, 10, 64)
@@ -176,7 +176,7 @@ func convertFromDBModel(policy *common_models.P2PPreheatPolicy) (*models.P2PPreh
 				log.Warningf("get p2p target err: %v", err)
 				continue
 			}
-			targetList = append(targetList, *target)
+			targetList = append(targetList, target)
 		}
 		ply.Targets = targetList
 	}

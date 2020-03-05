@@ -29,7 +29,7 @@ type P2PPreheatPolicy struct {
 	Description               string                     `json:"description"`
 	Filters                   []rep_models.Filter        `json:"filters"`
 	Project                   *common_models.Project     `json:"project"`
-	Targets                   []common_models.P2PTarget  `json:"targets"`
+	Targets                   []*common_models.P2PTarget `json:"targets"`
 	CreationTime              time.Time                  `json:"creation_time"`
 	UpdateTime                time.Time                  `json:"update_time"`
 	Enabled                   bool                       `json:"enabled"`
