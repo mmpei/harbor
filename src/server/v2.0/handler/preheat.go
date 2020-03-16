@@ -16,13 +16,13 @@ package handler
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/runtime/middleware"
 	api_preheat "github.com/goharbor/harbor/src/api/preheat"
-	dao_models "github.com/goharbor/harbor/src/pkg/p2p/preheat/dao/models"
+	preheat_models "github.com/goharbor/harbor/src/pkg/p2p/preheat/models"
 	"github.com/goharbor/harbor/src/server/v2.0/models"
 	"github.com/goharbor/harbor/src/server/v2.0/restapi/operations/preheat"
-	operation "github.com/goharbor/harbor/src/server/v2.0/restapi/operations/preheat"
 )
 
 func newPreheatAPI() *preheatAPI {
@@ -38,7 +38,7 @@ type preheatAPI struct {
 
 // CreateInstance is Create p2p instances
 func (p *preheatAPI) CreateInstance(ctx context.Context, params preheat.CreateInstanceParams) middleware.Responder {
-	id, err := api_preheat.DefaultController.CreateInstance(&dao_models.Metadata{
+	id, err := api_preheat.DefaultController.CreateInstance(&preheat_models.Metadata{
 		ID:             params.Instance.ID,
 		Name:           params.Instance.Name,
 		Description:    params.Instance.Description,
@@ -55,7 +55,7 @@ func (p *preheatAPI) CreateInstance(ctx context.Context, params preheat.CreateIn
 		return p.SendError(ctx, err)
 	}
 
-	return operation.NewCreateInstanceCreated().WithPayload(&models.InstanceCreatedResp{
+	return preheat.NewCreateInstanceCreated().WithPayload(&models.InstanceCreatedResp{
 		ID: id,
 	})
 }
@@ -66,7 +66,7 @@ func (p *preheatAPI) DeleteInstance(ctx context.Context, params preheat.DeleteIn
 		return p.SendError(ctx, err)
 	}
 
-	return operation.NewDeleteInstanceOK().WithPayload(&models.InstanceDeletedResp{
+	return preheat.NewDeleteInstanceOK().WithPayload(&models.InstanceDeletedResp{
 		Removed: params.InstanceID,
 	})
 }
@@ -78,7 +78,7 @@ func (p *preheatAPI) GetInstance(ctx context.Context, params preheat.GetInstance
 		return p.SendError(ctx, err)
 	}
 
-	return operation.NewGetInstanceOK().WithPayload(&models.Instance{
+	return preheat.NewGetInstanceOK().WithPayload(&models.Instance{
 		AuthData:       instance.AuthData,
 		AuthMode:       instance.AuthMode,
 		Description:    instance.Description,
@@ -95,8 +95,22 @@ func (p *preheatAPI) GetInstance(ctx context.Context, params preheat.GetInstance
 
 // ListInstances is List p2p instances
 func (p *preheatAPI) ListInstances(ctx context.Context, params preheat.ListInstancesParams) middleware.Responder {
-	// TODO(ChenDe): Support list parameters.
-	data, err := api_preheat.DefaultController.ListInstances(nil)
+	queryParams := &preheat_models.QueryParam{}
+	if params.PageSize != nil {
+		queryParams.PageSize = uint(*params.PageSize)
+	} else {
+		queryParams.PageSize = 10
+	}
+	if params.Page != nil {
+		queryParams.Page = uint(*params.Page)
+	} else {
+		queryParams.Page = 1
+	}
+	if params.Q != nil {
+		queryParams.Keyword = *params.Q
+	}
+
+	total, data, err := api_preheat.DefaultController.ListInstances(queryParams)
 	if err != nil {
 		return p.SendError(ctx, err)
 	}
@@ -118,13 +132,30 @@ func (p *preheatAPI) ListInstances(ctx context.Context, params preheat.ListInsta
 		})
 	}
 
-	return operation.NewListInstancesOK().WithPayload(instances)
+	return preheat.NewListInstancesOK().
+		WithXTotalCount(total).
+		WithLink(p.Links(ctx, params.HTTPRequest.URL, total, int64(queryParams.Page), int64(queryParams.PageSize)).String()).
+		WithPayload(instances)
 }
 
 // ListPreheatHistories is List preheats history
 func (p *preheatAPI) ListPreheatHistories(ctx context.Context, params preheat.ListPreheatHistoriesParams) middleware.Responder {
-	// TODO(ChenDe): Support list with params
-	data, err := api_preheat.DefaultController.LoadHistoryRecords(nil)
+	queryParams := &preheat_models.QueryParam{}
+	if params.PageSize != nil {
+		queryParams.PageSize = uint(*params.PageSize)
+	} else {
+		queryParams.PageSize = 10
+	}
+	if params.Page != nil {
+		queryParams.Page = uint(*params.Page)
+	} else {
+		queryParams.Page = 1
+	}
+	if params.Q != nil {
+		queryParams.Keyword = *params.Q
+	}
+
+	total, data, err := api_preheat.DefaultController.LoadHistoryRecords(queryParams)
 	if err != nil {
 		return p.SendError(ctx, err)
 	}
@@ -142,7 +173,10 @@ func (p *preheatAPI) ListPreheatHistories(ctx context.Context, params preheat.Li
 		})
 	}
 
-	return operation.NewListPreheatHistoriesOK().WithPayload(histories)
+	return preheat.NewListPreheatHistoriesOK().
+		WithXTotalCount(total).
+		WithLink(p.Links(ctx, params.HTTPRequest.URL, total, int64(queryParams.Page), int64(queryParams.PageSize)).String()).
+		WithPayload(histories)
 }
 
 // ListProviders is List available p2p providers.
@@ -165,14 +199,14 @@ func (p *preheatAPI) ListProviders(ctx context.Context, params preheat.ListProvi
 		})
 	}
 
-	return operation.NewListProvidersOK().WithPayload(providers)
+	return preheat.NewListProvidersOK().WithPayload(providers)
 }
 
 // PreheatImages is Start to preheat images
 func (p *preheatAPI) PreheatImages(ctx context.Context, params preheat.PreheatImagesParams) middleware.Responder {
 	preheatingImages, ok := params.PreheatReq["images"]
 	if !ok {
-		return operation.NewPreheatImagesBadRequest().WithPayload([]*models.Error{
+		return preheat.NewPreheatImagesBadRequest().WithPayload([]*models.Error{
 			{
 				Message: "missing images",
 			},
@@ -181,7 +215,7 @@ func (p *preheatAPI) PreheatImages(ctx context.Context, params preheat.PreheatIm
 
 	imageList, ok := preheatingImages.([]interface{})
 	if !ok {
-		return operation.NewPreheatImagesBadRequest().WithPayload([]*models.Error{
+		return preheat.NewPreheatImagesBadRequest().WithPayload([]*models.Error{
 			{
 				Message: "'images' should be an array",
 			},
@@ -189,16 +223,16 @@ func (p *preheatAPI) PreheatImages(ctx context.Context, params preheat.PreheatIm
 	}
 
 	if len(imageList) == 0 {
-		return operation.NewPreheatImagesBadRequest().WithPayload([]*models.Error{
+		return preheat.NewPreheatImagesBadRequest().WithPayload([]*models.Error{
 			{
 				Message: "no images submitted",
 			},
 		})
 	}
 
-	var imageRepos []dao_models.ImageRepository
+	var imageRepos []preheat_models.ImageRepository
 	for _, img := range imageList {
-		imageRepos = append(imageRepos, dao_models.ImageRepository(img.(string)))
+		imageRepos = append(imageRepos, preheat_models.ImageRepository(img.(string)))
 	}
 	result, err := api_preheat.DefaultController.PreheatImages(imageRepos...)
 	if err != nil {
@@ -217,10 +251,10 @@ func (p *preheatAPI) PreheatImages(ctx context.Context, params preheat.PreheatIm
 				TaskID:     s.TaskID,
 			})
 		}
-		preheatings[k] = statuses
+		preheatings[strconv.Itoa(int(k))] = statuses
 	}
 
-	return operation.NewPreheatImagesOK().WithPayload(preheatings)
+	return preheat.NewPreheatImagesOK().WithPayload(preheatings)
 }
 
 // UpdateInstance is Update instance
@@ -229,7 +263,7 @@ func (p *preheatAPI) UpdateInstance(ctx context.Context, params preheat.UpdateIn
 		return p.SendError(ctx, err)
 	}
 
-	return operation.NewUpdateInstanceOK().WithPayload(&models.InstanceUpdateResp{
+	return preheat.NewUpdateInstanceOK().WithPayload(&models.InstanceUpdateResp{
 		Updated: params.InstanceID,
 	})
 }

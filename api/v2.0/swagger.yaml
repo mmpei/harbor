@@ -598,9 +598,19 @@ paths:
       operationId: ListInstances
       parameters:
         - $ref: '#/parameters/requestId'
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/pageSize'
+        - $ref: '#/parameters/query'
       responses:
         '200':
           description: Success
+          headers:
+            X-Total-Count:
+              description: The total count of instances
+              type: integer
+            Link:
+              description: Link refers to the previous page and next page
+              type: string
           schema:
             type: array
             items:
@@ -735,9 +745,19 @@ paths:
       operationId: ListPreheatHistories
       parameters:
         - $ref: '#/parameters/requestId'
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/pageSize'
+        - $ref: '#/parameters/query'
       responses:
         '200':
           description: Success
+          headers:
+            X-Total-Count:
+              description: The total count of preheat histories
+              type: integer
+            Link:
+              description: Link refers to the previous page and next page
+              type: string
           schema:
             type: array
             items:
@@ -847,7 +867,7 @@ parameters:
     in: path
     description: Instance ID
     required: true
-    type: string
+    type: integer
 responses:
   '200':
     description: Success
@@ -1271,7 +1291,7 @@ definitions:
     type: object
     properties:
       id:
-        type: string
+        type: integer
         description: Unique ID
       name:
         type: string
@@ -1311,19 +1331,19 @@ definitions:
     type: object
     properties:
       updated:
-        type: string
+        type: integer
         description: ID of instance updated
   InstanceDeletedResp:
     type: object
     properties:
       removed:
-        type: string
+        type: integer
         description: ID of instance removed
   InstanceCreatedResp:
     type: object
     properties:
       id:
-        type: string
+        type: integer
         description: ID of instance created
   PreheatHistory:
     type: object
@@ -1347,7 +1367,7 @@ definitions:
         type: string
         description: provider
       instance:
-        type: string
+        type: integer
         description: instance
   PreheatingStatus:
     type: object
