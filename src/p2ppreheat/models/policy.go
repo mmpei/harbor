@@ -45,6 +45,10 @@ func (ppp *P2PPreheatPolicy) Valid(v *validation.Validation) {
 		v.SetError("name", "max length is 256")
 	}
 
+	if ppp.Project == nil {
+		v.SetError("project", "project id must be set")
+	}
+
 	if len(ppp.Targets) == 0 {
 		v.SetError("targets", "can not be empty")
 	}

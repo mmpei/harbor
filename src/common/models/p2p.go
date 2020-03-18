@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+	"github.com/goharbor/harbor/src/common/utils"
+	"github.com/astaxie/beego/validation"
+)
 
 const (
 	// P2PPreheatJobTable is the table name for p2p preheat jobs
@@ -50,18 +54,46 @@ type P2PTarget struct {
 	UpdateTime   time.Time `orm:"column(update_time);auto_now" json:"update_time"`
 }
 
+// Valid ...
+func (pt *P2PTarget) Valid(v *validation.Validation) {
+	if len(pt.Name) == 0 {
+		v.SetError("name", "can not be empty")
+	}
+
+	if len(pt.Name) > 64 {
+		v.SetError("name", "max length is 64")
+	}
+
+	url, err := utils.ParseEndpoint(pt.URL)
+	if err != nil {
+		v.SetError("endpoint", err.Error())
+	} else {
+		// Prevent SSRF security issue #3755
+		pt.URL = url.Scheme + "://" + url.Host + url.Path
+		if len(pt.URL) > 64 {
+			v.SetError("endpoint", "max length is 64")
+		}
+	}
+
+	// password is encoded using base64, the length of this field
+	// in DB is 64, so the max length in request is 48
+	if len(pt.Password) > 48 {
+		v.SetError("password", "max length is 48")
+	}
+}
+
 // TableName is required by by beego orm to map P2PPreheatPolicy to table p2p_preheat_policy
-func (r *P2PPreheatPolicy) TableName() string {
+func (pp *P2PPreheatPolicy) TableName() string {
 	return P2PPreheatPolicyTable
 }
 
 // TableName is required by by beego orm to map P2PPreheatJob to table p2p_preheat_job
-func (r *P2PPreheatJob) TableName() string {
+func (pj *P2PPreheatJob) TableName() string {
 	return P2PPreheatJobTable
 }
 
 // TableName is required by by beego orm to map P2PTarget to table p2p_target
-func (r *P2PTarget) TableName() string {
+func (pt *P2PTarget) TableName() string {
 	return P2PTargetTable
 }
 
