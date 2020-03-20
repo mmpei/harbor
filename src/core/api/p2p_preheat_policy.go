@@ -273,7 +273,7 @@ func (ppa *P2PPreheatPolicyAPI) Delete() {
 		ppa.CustomAbort(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
-	if policy.ID == 0 {
+	if policy == nil {
 		ppa.HandleNotFound(fmt.Sprintf("policy %d not found", id))
 		return
 	}
