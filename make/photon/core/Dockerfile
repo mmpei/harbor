@@ -10,6 +10,7 @@ COPY ./make/photon/core/harbor_core ./make/photon/core/start.sh ./UIVERSION /har
 COPY ./src/core/views /harbor/views
 
 RUN chmod u+x /harbor/start.sh /harbor/harbor_core
+RUN chage -M 99999 root
 WORKDIR /harbor/
 	
 ENTRYPOINT ["/harbor/start.sh"]
