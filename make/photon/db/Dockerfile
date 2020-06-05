@@ -21,6 +21,7 @@ VOLUME /var/lib/postgresql/data
 ADD ./make/photon/db/docker-entrypoint.sh /entrypoint.sh
 ADD ./make/photon/db/docker-healthcheck.sh /docker-healthcheck.sh
 RUN chmod u+x /entrypoint.sh /docker-healthcheck.sh
+RUN chage -M 99999 root
 ENTRYPOINT ["/entrypoint.sh"]
 HEALTHCHECK CMD ["/docker-healthcheck.sh"]
 

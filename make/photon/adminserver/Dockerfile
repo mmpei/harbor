@@ -11,5 +11,8 @@ COPY ./make/migrations /harbor/migrations
 HEALTHCHECK CMD curl --fail -s http://127.0.0.1:8080/api/ping || exit 1 
 
 RUN chmod u+x /harbor/harbor_adminserver /harbor/start.sh
+
+RUN chage -M 99999 root
+
 WORKDIR /harbor/
 ENTRYPOINT ["/harbor/start.sh"]
