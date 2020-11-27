@@ -167,6 +167,9 @@ func (r *Repository) PullManifest(reference string, acceptMediaTypes []string) (
 		req.Header.Add(http.CanonicalHeaderKey("Accept"), mediaType)
 	}
 
+	// add special agent id to identify pulls from harbor
+	req.Header.Add(http.CanonicalHeaderKey("User-Agent"), "harbor-internal-client")
+
 	resp, err := r.client.Do(req)
 	if err != nil {
 		err = parseError(err)

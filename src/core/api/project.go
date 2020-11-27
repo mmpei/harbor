@@ -435,8 +435,9 @@ func (p *ProjectAPI) populateProperties(project *models.Project) {
 	if config.WithChartMuseum() {
 		count, err := chartController.GetCountOfCharts([]string{project.Name})
 		if err != nil {
+			// just log but not abort, make registry independent with chartmuseum
 			log.Errorf("Failed to get total of charts under project %s: %v", project.Name, err)
-			p.CustomAbort(http.StatusInternalServerError, "")
+			//p.CustomAbort(http.StatusInternalServerError, "")
 		}
 
 		project.ChartCount = count
